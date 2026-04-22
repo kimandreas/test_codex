@@ -6,4 +6,5 @@ venv/
 build/
 dist/
 *.egg-info/
-
+.codex
+.~lock*#
