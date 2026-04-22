@@ -1,7 +1,9 @@
 from openpyxl import Workbook, load_workbook
 from openpyxl.comments import Comment
 
+from test_codex.chatgpt_excel import load_prompt_jobs
 from test_codex.chatgpt_excel import read_range_as_prompt
+from test_codex.chatgpt_excel import run_prompt_jobs
 from test_codex.chatgpt_excel import run_chatgpt_prompt_from_workbook
 from test_codex.excel_agent import apply_note_mappings, combine_excel_notes, combine_notes
 from test_codex.excel_agent import load_mappings
@@ -231,3 +233,58 @@ def test_run_chatgpt_prompt_reads_prompt_from_first_workbook(tmp_path) -> None:
 
     saved_output = load_workbook(response_path)
     assert saved_output["Results"]["B2"].value == "Assessment complete."
+
+
+def test_load_prompt_jobs_from_csv(tmp_path) -> None:
+    prompt_jobs_path = tmp_path / "prompt_jobs.csv"
+    prompt_jobs_path.write_text(
+        "prompt_sheet,prompt_range,response_sheet,response_cell\n"
+        "Sheet2,A1:B8,Sheet1,B2\n",
+        encoding="utf-8",
+    )
+
+    jobs = load_prompt_jobs(prompt_jobs_path)
+
+    assert len(jobs) == 1
+    assert jobs[0].prompt_sheet == "Sheet2"
+    assert jobs[0].prompt_range == "A1:B8"
+    assert jobs[0].response_sheet == "Sheet1"
+    assert jobs[0].response_cell == "B2"
+
+
+def test_run_prompt_jobs_writes_multiple_responses(tmp_path) -> None:
+    workbook_path = tmp_path / "assessment_tool.xlsx"
+
+    workbook = Workbook()
+    prompt_sheet = workbook.active
+    prompt_sheet.title = "Sheet2"
+    prompt_sheet["A1"] = "Prompt one"
+    prompt_sheet["A10"] = "Prompt two"
+    workbook.create_sheet("Sheet1")
+    workbook.save(workbook_path)
+
+    prompt_jobs_path = tmp_path / "prompt_jobs.csv"
+    prompt_jobs_path.write_text(
+        "prompt_sheet,prompt_range,response_sheet,response_cell\n"
+        "Sheet2,A1:A1,Sheet1,B2\n"
+        "Sheet2,A10:A10,Sheet1,B7\n",
+        encoding="utf-8",
+    )
+
+    def fake_response(prompt: str, model: str, instructions: str | None) -> str:
+        return f"response for {prompt}"
+
+    results = run_prompt_jobs(
+        workbook_path,
+        workbook_path,
+        load_prompt_jobs(prompt_jobs_path),
+        response_generator=fake_response,
+    )
+
+    saved_workbook = load_workbook(workbook_path)
+    assert [response for _, response in results] == [
+        "response for Prompt one",
+        "response for Prompt two",
+    ]
+    assert saved_workbook["Sheet1"]["B2"].value == "response for Prompt one"
+    assert saved_workbook["Sheet1"]["B7"].value == "response for Prompt two"

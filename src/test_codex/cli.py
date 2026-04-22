@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import os
 
+from test_codex.chatgpt_excel import load_prompt_jobs, run_prompt_jobs
 from test_codex.chatgpt_excel import run_chatgpt_prompt_from_workbook
 from test_codex.excel_agent import NoteMapping, apply_note_mappings, load_mappings
 
@@ -51,6 +52,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--mapping",
         help="CSV file describing multiple note transfers to apply in one run.",
+    )
+    parser.add_argument(
+        "--prompt-jobs",
+        help="CSV file describing multiple ChatGPT prompt jobs to run in one command.",
     )
     parser.add_argument(
         "--prompt-range",
@@ -133,6 +138,21 @@ def main(argv: list[str] | None = None) -> None:
     for mapping, combined_note in results:
         print(f"Wrote combined note to {mapping.target_sheet}!{mapping.target_cell}:")
         print(combined_note)
+
+    if args.prompt_jobs:
+        prompt_results = run_prompt_jobs(
+            args.output_workbook,
+            args.output_workbook,
+            load_prompt_jobs(args.prompt_jobs),
+            model=args.model,
+            instructions=args.instructions,
+        )
+        for job, response_text in prompt_results:
+            print(
+                f"Wrote ChatGPT response from {job.prompt_sheet}!{job.prompt_range} "
+                f"to {job.response_sheet}!{job.response_cell}:"
+            )
+            print(response_text)
 
 
 if __name__ == "__main__":

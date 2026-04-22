@@ -92,20 +92,8 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest
 That environment variable keeps pytest focused on this project's tests and avoids auto-loading unrelated plugins from global tools such as ROS.
 
 # Actual Run: move comments for team 1
-test-codex 7~8주차_지능1_A_B그룹_평가.xlsx assessment_tool.xlsx --mapping t1_mappings.csv
+test-codex 7~8주차_지능1_A_B그룹_평가.xlsx assessment_tool.xlsx --mapping t1_mappings.csv --prompt-jobs prompt_jobs.csv
 
-## Generate my summary comments
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet2 --prompt-range A1:B8 --response-sheet Sheet1 --response-cell B2
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet2 --prompt-range A10:B14 --response-sheet Sheet1 --response-cell B7
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet2 --prompt-range A16:B17 --response-sheet Sheet1 --response-cell B12
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet2 --prompt-range A19:B21 --response-sheet Sheet1 --response-cell B17
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet2 --prompt-range A23:B25 --response-sheet Sheet1 --response-cell B22
-
-## Generate summary comments of all three people
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet1 --prompt-range A1:B4 --response-sheet Sheet1 --response-cell B5
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet1 --prompt-range A6:B9 --response-sheet Sheet1 --response-cell B10
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet1 --prompt-range A11:B14 --response-sheet Sheet1 --response-cell B15
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet1 --prompt-range A16:B19 --response-sheet Sheet1 --response-cell B20
-test-codex assessment_tool.xlsx assessment_tool.xlsx --prompt-sheet Sheet1 --prompt-range A21:B24 --response-sheet Sheet1 --response-cell B25
-
-# change mapping to t2_mappings.csv and t3_mappings.csv for team 2 and team 3 and repeat the summary commands above
+# Change mapping to t2_mappings.csv and t3_mappings.csv for team 2 and team 3.
+test-codex 7~8주차_지능1_A_B그룹_평가.xlsx assessment_tool.xlsx --mapping t2_mappings.csv --prompt-jobs prompt_jobs.csv
+test-codex 7~8주차_지능1_A_B그룹_평가.xlsx assessment_tool.xlsx --mapping t3_mappings.csv --prompt-jobs prompt_jobs.csv
